@@ -93,7 +93,13 @@ def get_dataset(dataset_type, data, schemas=None, autoinspect_func=autoinspect.c
     if dataset_type == 'PandasDataset':
         df = pd.DataFrame(data)
         if schemas and "pandas" in schemas:
-            pandas_schema = {key:np.dtype(value) for (key, value) in schemas["pandas"].items()}
+            pandas_schema = {}
+            for key, value in schemas["pandas"].items():
+                if value == "datetime64":
+                    df[key] = pd.to_datetime(df[key])
+                else:
+                    pandas_schema[key] = np.dtype(value)
+            # pandas_schema = {key:np.dtype(value) for (key, value) in schemas["pandas"].items()}
             df = df.astype(pandas_schema)
         return PandasDataset(df, autoinspect_func=autoinspect_func)
     elif dataset_type == 'SqlAlchemyDataset':
