@@ -15,6 +15,21 @@ from .test_utils import get_dataset, CONTEXTS
 # CONTEXTS = ['PandasDataset', 'SqlAlchemyDataset', 'SparkDFDataset']
 
 
+def pytest_addoption(parser):
+    parser.addoption(
+        "--disable_spark_tests",
+        # action="append",
+        default=False,
+        help="list of stringinputs to pass to test functions",
+    )
+
+
+def pytest_generate_tests(metafunc):
+    if "disable_spark_tests" in metafunc.fixturenames:
+        metafunc.parametrize(
+            "disable_spark_tests", metafunc.config.getoption("disable_spark_tests"))
+
+
 @pytest.fixture
 def empty_expectations_config():
     config = {
